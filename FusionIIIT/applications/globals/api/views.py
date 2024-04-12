@@ -39,8 +39,7 @@ def login(request):
 
     designation=[]
                 
-      
-                
+
     designation.append(str(user.extrainfo.user_type))
     for i in design:
         if str(i.designation) != str(user.extrainfo.user_type):
