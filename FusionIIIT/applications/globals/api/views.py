@@ -30,6 +30,29 @@ def login(request):
     serializer.is_valid(raise_exception=True)
     user = get_and_authenticate_user(**serializer.validated_data)
     data = serializers.AuthUserSerializer(user).data
+    print(user.id)
+    desig = list(HoldsDesignation.objects.select_related('user','working','designation').all().filter(working = user).values_list('designation'))
+    print(desig)
+    b = [i for sub in desig for i in sub]
+    design = HoldsDesignation.objects.select_related('user','designation').filter(working=user)
+
+    designation=[]
+                
+                
+    if str(user.extrainfo.user_type) == "student":
+        designation.append(str(user.extrainfo.user_type))
+        
+    for i in design:
+        if str(i.designation) != str(user.extrainfo.user_type):
+            print('-------')
+            print(i.designation)
+            print(user.extrainfo.user_type)
+            print('')
+            designation.append(str(i.designation))
+    for i in designation:
+        print(i)
+
+    
     resp = {
         'success' : 'True',
         'message' : 'User logged in successfully',
@@ -107,6 +130,12 @@ def profile(request, username=None):
     elif profile['user_type'] == 'faculty':
         print(username)
         return redirect('/eis/api/profile/' + (username+'/' if username else ''))
+    elif profile['user_type'] == 'staff':
+        resp = {
+            'user' : user_detail,
+            'profile' : profile,
+        }
+        return Response(data=resp, status=status.HTTP_200_OK)   
 
 @api_view(['PUT'])
 def profile_update(request):
